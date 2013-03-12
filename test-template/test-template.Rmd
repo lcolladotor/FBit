@@ -4,7 +4,7 @@ opts_knit$set(upload.fun=imgur_upload)
 opts_chunk$set(fig.width=5, fig.height=5)
 ```
 
-Testing the post template from [FBit template]()
+Testing the post template from [FBit template](https://github.com/lcolladotor/FBit/blob/master/R-post-template/R-post-template.Rmd)
 
 
 ```{r, message=FALSE}
@@ -12,3 +12,5 @@ library(ggplot2)
 qplot(hp, mpg, 
     data = mtcars) + geom_smooth()
 ```
+
+You can also visualize the test [here](http://htmlpreview.github.com/?https://github.com/lcolladotor/FBit/blob/master/test-template/test-template.html)
