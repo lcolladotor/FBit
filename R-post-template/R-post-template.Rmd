@@ -1,6 +1,6 @@
 ```{r setup, echo=FALSE}
 opts_knit$set(upload.fun=imgur_upload)
-opts_chunk$set(fig.width=5, fig.height=5)
+opts_chunk$set(fig.width=5, fig.height=5, cache=TRUE)
 ```
 
 Start post
