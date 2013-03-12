@@ -1,0 +1,14 @@
+
+```{r setup, echo=FALSE}
+opts_knit$set(upload.fun=imgur_upload)
+opts_chunk$set(fig.width=5, fig.height=5)
+```
+
+Testing the post template from [FBit template]()
+
+
+```{r, message=FALSE}
+library(ggplot2)
+qplot(hp, mpg, 
+    data = mtcars) + geom_smooth()
+```
