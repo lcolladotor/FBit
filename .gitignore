@@ -1,4 +1,9 @@
 ## Cache files
 cache/
+
+## Ignore bibliography files
 *.bib
+
+## Ignore markdown files since the raw is Rmd and the output is html
+*.md
 

@@ -1,0 +1,33 @@
+```{r setup, echo=FALSE, message=FALSE}
+## Uncomment after your are ready to publish the post
+#opts_knit$set(upload.fun=imgur_upload)
+opts_chunk$set(fig.width=5, fig.height=5, cache=TRUE)
+
+## Load knitcitations with a clean bibliography
+library(knitcitations)
+cleanbib()
+cite_options(tooltip=TRUE)
+
+## I made my own citing function since citep() doesn't work like I want to with
+## urls that are not really pages themselve like part of a GitHub repo.
+mycitep <- function(x, short, year=substr(date(), 21, 24), tooltip=TRUE) {
+	tmp <- citep(x)
+	res <- gsub("></a>", paste0(">", short, "</a>"), tmp)
+	if(tooltip) {
+		res <- gsub("\\?\\?\\?\\?", year, res)
+	}
+	res
+}
+## Here's an example
+# mycitep("https://github.com/lcolladotor/lcollado753", "Collado, 2013")
+```
+
+I do not have a clear memory of when I started to write or in which language it was. My first written words might have been in English since I lived in Boston (USA) three years during my early childhood. By age five I was back in Mexico and that is where I am sure I wrote my first full homeworks. During elementary school, I changed languages once more---this time to French. By middle school, I started to be interested in two new types of languages. One was mathematics which I liked, but which I didn't consider till much later. The other was related to computers as I learnt the very basics of HTML---that's all I know so far. In college---having reverted back to Spanish and English---and in my current stage in graduate school, I am a writer because I write---I mainly typeset using `LaTeX`---my homeworks, code in `R`, and summarize findings in reports. For the past year, I have been using [Fellgernon Bit](http://fellgernon.tumblr.com/) to practice writing and hopefully improve my skills. Furthermore, for me the process of writing helps me clarify my thoughts and organize them before attempting to communicate them. Sometimes it works, others it doesn't. Finally, I am a writer because it is crucial in the academic environment to be able to communicate through the printed word. This is tricky because sometimes you want to be very short, direct but not leave anything important out, like when emailing a professor. Other times, you have to be very precise and clear yet tell an interesting story such as when writing a scientific report. 
+
+Overall, I consider myself a writer in training and would like to improve. But as with everything, practice is key. That's a big part of why I blog and why I'm enrolled in this course.
+
+
+```{r results='asis', echo=FALSE}
+## Print bibliography
+bibliography()
+```
