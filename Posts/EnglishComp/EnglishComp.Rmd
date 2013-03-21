@@ -41,8 +41,6 @@ mycitep <- function(x, short, year=substr(date(), 21, 24), tooltip=TRUE) {
 	}
 	res
 }
-## Here's an example
-mycitep("https://github.com/lcolladotor/lcollado753", "Collado, 2013")
 
 ## You already saw an inline working example in the post itself.
 ```

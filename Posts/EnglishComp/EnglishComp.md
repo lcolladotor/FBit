@@ -30,15 +30,6 @@ mycitep <- function(x, short, year = substr(date(), 21, 24), tooltip = TRUE) {
     }
     res
 }
-## Here's an example
-mycitep("https://github.com/lcolladotor/lcollado753", "Collado, 2013")
-```
-
-```
-## [1] "(<span class=\"showtooltip\" title=\"lcolladotor (2013). lcollado753. \nhttps://github.com/lcolladotor/lcollado753 [Online.\nlast-accessed: 2013-03-21 02:37:34]. \nhttps://github.com/lcolladotor/lcollado753.\"><a href=\"https://github.com/lcolladotor/lcollado753\">Collado, 2013</a></span>)"
-```
-
-```r
 
 ## You already saw an inline working example in the post itself.
 ```
@@ -49,7 +40,6 @@ mycitep("https://github.com/lcolladotor/lcollado753", "Collado, 2013")
 
 
 - Carl Boettiger,   (2013) knitcitations.  *Lab Notebook*  [http://www.carlboettiger.info/2012/05/30/knitcitations.html](http://www.carlboettiger.info/2012/05/30/knitcitations.html)
--  lcolladotor,  lcollado753.  *GitHub*  [https://github.com/lcolladotor/lcollado753](https://github.com/lcolladotor/lcollado753)
 -  cboettig,  knitcitations.  *GitHub*  [https://github.com/cboettig/knitcitations](https://github.com/cboettig/knitcitations)
 -  Coursera.  *Coursera*  [https://www.coursera.org/course/composition](https://www.coursera.org/course/composition)
 
