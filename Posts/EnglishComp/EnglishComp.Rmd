@@ -1,0 +1,56 @@
+```{r setup, echo=FALSE, message=FALSE}
+## Uncomment after your are ready to publish the post
+#opts_knit$set(upload.fun=imgur_upload)
+opts_chunk$set(fig.width=5, fig.height=5, cache=TRUE)
+
+## Load knitcitations with a clean bibliography
+library(knitcitations)
+cleanbib()
+cite_options(tooltip=TRUE)
+
+## I made my own citing function since citep() doesn't work like I want to with
+## urls that are not really pages themselve like part of a GitHub repo.
+mycitep <- function(x, short, year=substr(date(), 21, 24), tooltip=TRUE) {
+	tmp <- citep(x)
+	res <- gsub("></a>", paste0(">", short, "</a>"), tmp)
+	if(tooltip) {
+		res <- gsub("\\?\\?\\?\\?", year, res)
+	}
+	res
+}
+## Here's an example
+# mycitep("https://github.com/lcolladotor/lcollado753", "Collado, 2013")
+```
+
+This week started the English Composition I: Achieving Expertise course `r mycitep("https://www.coursera.org/course/composition", "Comer, 2013")` that I have been looking forward to. 
+
+I am not sure yet how long I will last, but I hope to enjoy it as much as I can. Plus, it should help me with my posting and other writing areas. While I last in the course, I plan to publish my writings in the blog too. So you will hopefully see me be more active here.
+
+As it is important to cite when writing, I have also figured out how to do so automatically in Rmd files. For that I learnt how to use __knitcitations__ from the GitHub instructions `r mycitep("https://github.com/cboettig/knitcitations", "knitcitations")` and a explanatory post `r citep("http://www.carlboettiger.info/2012/05/30/knitcitations.html")`.
+
+__knitcitations__ is great, but it kind of struggles with some pages. That is why I modified my template in [FBit](https://github.com/lcolladotor/FBit) by writing my own citing function for pages where `citep` fails. Here is the code:
+
+```{r}
+## I made my own citing function since citep() doesn't work like I want to with
+## urls that are not really pages themselve like part of a GitHub repo.
+mycitep <- function(x, short, year=substr(date(), 21, 24), tooltip=TRUE) {
+	tmp <- citep(x)
+	res <- gsub("></a>", paste0(">", short, "</a>"), tmp)
+	if(tooltip) {
+		res <- gsub("\\?\\?\\?\\?", year, res)
+	}
+	res
+}
+## Here's an example
+mycitep("https://github.com/lcolladotor/lcollado753", "Collado, 2013")
+
+## You already saw an inline working example in the post itself.
+```
+
+
+
+
+```{r results='asis', echo=FALSE}
+## Print bibliography
+bibliography()
+```
