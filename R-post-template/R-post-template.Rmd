@@ -1,5 +1,6 @@
 ```{r setup, echo=FALSE, message=FALSE}
-opts_knit$set(upload.fun=imgur_upload)
+## Uncomment after your are ready to publish the post
+#opts_knit$set(upload.fun=imgur_upload)
 opts_chunk$set(fig.width=5, fig.height=5, cache=TRUE)
 
 ## Load knitcitations with a clean bibliography
@@ -17,6 +18,8 @@ mycitep <- function(x, short, year=substr(date(), 21, 24), tooltip=TRUE) {
 	}
 	res
 }
+## Here's an example
+# mycitep("https://github.com/lcolladotor/lcollado753", "Collado, 2013")
 ```
 
 Start post
