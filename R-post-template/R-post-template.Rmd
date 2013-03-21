@@ -20,3 +20,10 @@ mycitep <- function(x, short, year=substr(date(), 21, 24), tooltip=TRUE) {
 ```
 
 Start post
+
+
+
+```{r results='asis', echo=FALSE}
+## Print bibliography
+bibliography()
+```
