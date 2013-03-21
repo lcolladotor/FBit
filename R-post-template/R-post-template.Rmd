@@ -1,7 +1,22 @@
 ```{r setup, echo=FALSE, message=FALSE}
 opts_knit$set(upload.fun=imgur_upload)
 opts_chunk$set(fig.width=5, fig.height=5, cache=TRUE)
+
+## Load knitcitations with a clean bibliography
 library(knitcitations)
+cleanbib()
+cite_options(tooltip=TRUE)
+
+## I made my own citing function since citep() doesn't work like I want to with
+## urls that are not really pages themselve like part of a GitHub repo.
+mycitep <- function(x, short, year=substr(date(), 21, 24), tooltip=TRUE) {
+	tmp <- citep(x)
+	res <- gsub("></a>", paste0(">", short, "</a>"), tmp)
+	if(tooltip) {
+		res <- gsub("\\?\\?\\?\\?", year, res)
+	}
+	res
+}
 ```
 
 Start post
