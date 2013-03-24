@@ -21,12 +21,20 @@ mycitep <- function(x, short, year=substr(date(), 21, 24), tooltip=TRUE) {
 ## Here's an example
 # mycitep("https://github.com/lcolladotor/lcollado753", "Collado, 2013")
 ```
+```{r bibsetup, echo=FALSE, message=FALSE, warning=FALSE}
+write.bibtex(c("knitcitations" = citation("knitcitations")), file = "pkgs.bib")
+bib <- read.bibtex("pkgs.bib")
+```
+
+
 
 Start post
 
 
+Citations made with `knitcitations` `r mycitep(bib[["knitcitations"]], "Boettiger, 2013")`.
 
-```{r results='asis', echo=FALSE}
+
+```{r results='asis', echo=FALSE, cache=FALSE}
 ## Print bibliography
 bibliography()
 ```

@@ -1,0 +1,172 @@
+```{r setup, echo=FALSE, message=FALSE, warning=FALSE}
+## Uncomment after your are ready to publish the post
+opts_knit$set(upload.fun=imgur_upload)
+opts_chunk$set(fig.width=6, fig.height=6, cache=FALSE)
+
+## Load knitcitations with a clean bibliography
+library(knitcitations)
+cleanbib()
+cite_options(tooltip=TRUE)
+
+## I made my own citing function since citep() doesn't work like I want to with
+## urls that are not really pages themselve like part of a GitHub repo.
+mycitep <- function(x, short, year=substr(date(), 21, 24), tooltip=TRUE) {
+	tmp <- citep(x)
+	res <- gsub("></a>", paste0(">", short, "</a>"), tmp)
+	if(tooltip) {
+		res <- gsub("\\?\\?\\?\\?", year, res)
+	}
+	res
+}
+## Here's an example
+# mycitep("https://github.com/lcolladotor/lcollado753", "Collado, 2013")
+
+write.bibtex(c("shiny" = citation("shiny"), "knitcitations" = citation("knitcitations")), file = "example.bib")
+bib <- read.bibtex("example.bib")
+```
+
+
+
+It was great to have a little break, _Spring break_, although the weather didn't feel like spring at all! During the early part of the break I worked on my final project for Jeff Leek's data analysis class, which we call 140.753 here. Continuing [my previous posts on the topic](http://fellgernon.tumblr.com/tagged/jhsph753\#.UU44Y1vF2c4), this time I'll share the results of my final project.
+
+At the beginning of the course, we had to submit a project plan (more like a proposal) and [in mine](https://github.com/lcolladotor/lcollado753/blob/master/hw/projectplan/lcollado_projectplan.pdf) I announced my interest to look into some sports data. At the time I included a few links to Brian Burke's Advanced NFL Stats site `r mycitep("http://www.advancednflstats.com/", "Burke")`. At the time I didn't know that Burke's site described in detail a lot of the information I would end up using.
+
+My final project had to do with splitting NFL games by half and then use only the play-by-play data from the first half to predict if team A or B would win the game. My overall goal was to have some fun with sports data which I had never looked at, but then also try to come up with something I would personally use in the future. So, why split games by half? I personally would like to know if I should keep watching a game or not at half time. Having a tool to help me decide would be great, and well, if the team I'm rooting for has high chances of losing or winning, ideally I would switch to doing something else. A related question that I didn't try to answer is which half is worth watching? This would be a meaningful question if you only have time to watch one of them.
+
+To truly satisfy my goals, it wasn't enough to just build a predictive model. That is why I also built a web application using the `shiny` package `r mycitep(bib[["shiny"]], "RStudio and Inc., 2013")`. It was the first time I did a shiny app, but thanks to the good manual and some examples on GitHub from John Muschelli like his [Shiny_model](https://github.com/muschellij2/Shiny_model) it wasn't so bad. I thus invite you to test and browse my shiny app at http://glimmer.rstudio.com/lcolladotor/NFLhalf/. It could be improved by adding some functions that scrape live data for the 2013 season so you don't have to input all the variables needed by using the sliders. Anyhow, I'm happy with the result.
+
+The entire project's code, EDA steps, shiny app, and report are available via GitHub in my repository `r mycitep("https://github.com/lcolladotor/lcollado753/tree/master/final/nfl_half", "lcollado753")`. While the details are in the report, I'll give a brief summary here.
+
+Basically, I summarized the play-by-play data for all NFL games from 2002 to 2012 seasons as provided by Burke `r mycitep("http://www.advancednflstats.com/2010/04/play-by-play-data.html", "Burke, 2010")`. I used some of the variables Burke uses `r mycitep("http://www.advancednflstats.com/2009/01/how-model-works-detailed-example.html", "Burke, 2009")`
+ and some others like the score difference, who starts the second half, and the game day winning percentages of both teams. After exploring the data, I discarded the years 2002 to 2005. Then, I trained a model using the 2006 to 2011 data and did some quick model selection. Note that I'm not doing the adjustment by opponent the way Burke did it `r mycitep("http://www.advancednflstats.com/2009/01/how-model-works-detailed-example-part-2.html", "Burke, 2009-2")` in part because I was running out of time, but also because the model already uses the current game winning percentages of both teams to consider the two team's strength. I evaluated the model using the 2012 data and after seeing that it worked decently enough, I trained a second model using the data from 2006 to 2012 so it can be used for the 2013 season. These two trained models are the ones available in the shiny app I made.
+
+ In the report, I didn't include ROCs---a big miss---so here they go. The code I will show below is heavily based on a post on GLMs `r mycitep("http://denishaine.wordpress.com/2013/03/19/veterinary-epidemiologic-research-glm-evaluating-logistic-regression-models-part-3/", "Haine, 2013")`. The code below is written in a way that you can easily reproduce it if you have cloned my repository for the 140.753 class `r mycitep("https://github.com/lcolladotor/lcollado753/tree/master/final/nfl_half", "lcollado753")`. 
+ 
+
+First, some setup steps.
+
+```{r maindir, echo=FALSE}
+## Specify the directory where you cloned the lcollado753 repo
+maindir <- "/Users/lcollado/Dropbox/JHSPH/140.753 Advanced Methods III"
+```
+
+```{r maindirEx, eval=FALSE}
+## Specify the directory where you cloned the lcollado753 repo
+maindir <- "whereYouClonedTheRepo"
+```
+
+```{r data}
+## Load packages needed
+suppressMessages(library(ROCR))
+library(ggplot2)
+
+## Load fits.
+## Remember that 1st one used data from 2006 to 2011
+## and the 2nd one used data from 2006 to 2012.
+load(paste0(maindir, "/lcollado753/final/nfl_half/EDA/model/fits.Rdata"))
+```
+
+Next, I make the ROCs for both trained models using the data that they were trained on. They should be quite good since it uses the same data to build the model that it will then try to predict.
+
+```{r ROC}
+## Make the ROC plots
+
+## Simple list where I'll store all the results so I can compare the ROC plots later on
+all <- list()
+
+## Construct prediction function
+for(i in 1:2) {
+	## Predict on the original data
+	pred <- predict(fits[[i]])
+	
+	## Subset original data (remove NA's)
+	data <- fits[[i]]$data
+	data <- data[complete.cases(data),]
+	
+	## Construct prediction function
+	pred.fn <- prediction(pred, data$win)
+	
+	## Get performance info
+	perform <- performance(pred.fn, "tpr", "fpr")
+	
+	## Get ready to plot
+	toPlot <- data.frame(tpr = unlist(slot(perform, "y.values")), fpr = unlist(slot(perform, "x.values")))
+	all <- c(all, list(toPlot))
+
+	## Make the plot
+	res <- ggplot(toPlot) + geom_line(aes(x=fpr, y=tpr)) + geom_abline(intercept=0, slope=1, colour="orange") + ylab("Sensitivity") + xlab("1 - Specificity") + ggtitle(paste("Years 2006 to", c("2011", "2012")[i]))
+	print(res)
+	
+	## Print the AUC value
+	print(unlist(performance(pred.fn, "auc")@y.values))
+}
+
+```
+
+Both ROC plots look pretty similar (well, the data sets are very similar!) and have relatively high AUC values.
+
+
+Next, I make the ROC plot using the model trained with the data from 2006 to 2011 to predict the outcomes for the 2012 games. 
+
+```{r pred2012}
+## Load 2012 data
+load(paste0(maindir, "/lcollado753/final/nfl_half/data/pred/info2012.Rdata"))
+
+## Predict using model fit with data from 2006 to 2011
+pred <- predict(fits[[1]], info2012)
+
+## Construction prediction function
+pred.fn <- prediction(pred, info2012$win)
+
+## Get performance info
+perform <- performance(pred.fn, "tpr", "fpr")
+
+## Get ready to plot
+toPlot <- data.frame(tpr = unlist(slot(perform, "y.values")), fpr = unlist(slot(perform, "x.values")))
+all <- c(all, list(toPlot))
+
+## Make the plot
+ggplot(toPlot) + geom_line(aes(x=fpr, y=tpr)) + geom_abline(intercept=0, slope=1, colour="orange") + ylab("Sensitivity") + xlab("1 - Specificity") + ggtitle("Model trained 2006-2011 predicting 2012")
+
+## Print the AUC value
+print(unlist(performance(pred.fn, "auc")@y.values))
+
+```
+
+The steps in the curve are more visible since it is using less data. It also seems to be a little less good than the other two, as expected. This is clear when comparing the AUC values. 
+
+
+Finally, I plot all curves in the same picture to visually compare them.
+
+
+```{r allInOne, fig.width=7.25}
+names(all) <- c("train2011", "train2012", "pred2012")
+for(i in 1:3) {
+	all[[i]] <- cbind(all[[i]], rep(names(all)[i], nrow(all[[i]])))
+	colnames(all[[i]])[3] <- "set"
+}
+all <- do.call(rbind, all)
+
+ggplot(all) + geom_line(aes(x=fpr, y=tpr, colour=set)) + geom_abline(intercept=0, slope=1, colour="orange") + ylab("Sensitivity") + xlab("1 - Specificity") + ggtitle("Comparing ROCs")
+```
+
+Both ROCs with the trained data (train2011, train2012) are nearly identical and both are slightly superior to the one predicting the 2012 games.
+
+
+Overall I am happy with the results and while some things can certainly be improved, I look forward to the NFL 2013 season. Also, remember that Burke publishes his winning estimated probabilities from week 4 onward `r mycitep("http://fifthdown.blogs.nytimes.com/author/brian-burke/", "The Fifth Down Blog")`. So you might be interested on comparing the probability at half time versus his estimated probability which is calculated before the game starts. I mean, maybe you could use the difference between the two to have an idea of how unexpected the first half was. After all, if a game falls outside the pattern it might be worth watching.
+
+
+Citations made with `knitcitations` `r mycitep(bib[["knitcitations"]], "Boettiger, 2013")`.
+
+
+
+```{r results='asis', echo=FALSE, cache=FALSE}
+## Print bibliography
+bibliography()
+```
+
+
+
+
+
+
