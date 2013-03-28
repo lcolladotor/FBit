@@ -70,7 +70,7 @@ Finally, are you not incredulous to see this situation happen? Shouldn't the deb
 
 
 
-Citations made with `knitcitations` `r mycitep(bib[["knitcitations"]], "Boettiger, 2013")` and the post written in the Rmd format powered by `knitr` `r citep(bib[["knitr"]])`.
+Citations made with `knitcitations` `r mycitep(bib[["knitcitations"]], "Boettiger, 2013")` and the post was written in the Rmd format powered by `knitr` `r citep(bib[["knitr"]])`.
 
 
 ```{r results='asis', echo=FALSE, cache=FALSE}
