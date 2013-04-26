@@ -1,7 +1,7 @@
 ```{r setup, echo=FALSE, message=FALSE}
 ## Uncomment after your are ready to publish the post
 #opts_knit$set(upload.fun=imgur_upload)
-opts_chunk$set(fig.width=5, fig.height=5, cache=TRUE)
+opts_chunk$set(fig.width=5, fig.height=5, cache=FALSE)
 
 ## Load knitcitations with a clean bibliography
 library(knitcitations)
@@ -22,13 +22,103 @@ mycitep <- function(x, short, year=substr(date(), 21, 24), tooltip=TRUE) {
 # mycitep("https://github.com/lcolladotor/lcollado753", "Collado, 2013")
 ```
 ```{r bibsetup, echo=FALSE, message=FALSE, warning=FALSE}
-write.bibtex(c("knitcitations" = citation("knitcitations", "plyr"=citation("plyr"), "doMC"=citation("doMC"))), file = "pkgs.bib")
+write.bibtex(c("knitcitations" = citation("knitcitations"), "plyr"=citation("plyr"), "doMC"=citation("doMC"), "foreach"=citation("foreach")), file = "pkgs.bib")
 bib <- read.bibtex("pkgs.bib")
 ```
 
 
 
-Start post
+A few weeks back I dedicated a short amount of time to actually read what `plyr` `r citep(bib[["plyr"]])` is about and I was surprised. The whole idea behind `plyr` is very simple: expand the `apply()` family to do things easy. `plyr` has many functions whose name ends with `ply` which is short of apply. Then, the functions are identified by two letters before `ply` which are abbreviations for the input (first letter) and output (second one). For instance, `ddply` takes an input a `data.frame` and returns a `data.frame` while `ldply` takes as input a `list` and returns a `data.frame`.
+
+The syntax is pretty straight forward. For example, here are the arguments for `ddply`:
+```{r}
+library(plyr)
+args(ddply)
+```
+
+What we basically have to specify are
+* `.data` which in general is the name of the input `data.frame`, 
+* `.variables` which is a vector (note the use of the `.` function) of variable names. In this case, `ddply` is very useful for applying some function to subsets of the data as specified by these variables,
+* `.fun` which is the actual function we want to run,
+* and `...` which are parameter options for the function we are running.
+
+From the `ddply` help page we have the following examples:
+```{r}
+dfx <- data.frame(
+  group = c(rep('A', 8), rep('B', 15), rep('C', 6)),
+  sex = sample(c("M", "F"), size = 29, replace = TRUE),
+  age = runif(n = 29, min = 18, max = 54)
+)
+
+# Note the use of the '.' function to allow
+# group and sex to be used without quoting
+ddply(dfx, .(group, sex), summarize,
+ mean = round(mean(age), 2),
+ sd = round(sd(age), 2))
+
+# An example using a formula for .variables
+ddply(baseball[1:100,], ~ year, nrow)
+# Applying two functions; nrow and ncol
+ddply(baseball, .(lg), c("nrow", "ncol"))
+```
+
+
+But this is not the end of the story! Something I really liked about `plyr` is that it can be parallelized via the `foreach` `r citep(bib[["foreach"]])` package. I don't know much about `foreach`, but all I learnt is that you have to use other packages such as `doMC` `r citep(bib[["doMC"]])` to actually run the code. It's like `foreach` specifies the infraestructure to communicate in parallel (and split jobs) and packages like `doMC` tailor it for specific environments like for running in multi-core.
+
+Running things in parallel can then be very easy. Basically, you load the packages, specify the number of cores, and run your `ply` function. Here is a short example:
+
+```{r}
+## Load packages
+library(plyr)
+library(doMC)
+
+## Specify the number of cores
+registerDoMC(4)
+
+## Check how many cores we are using
+getDoParWorkers()
+
+## Run your ply function
+ddply(dfx, .(group, sex), summarize,
+ mean = round(mean(age), 2),
+ sd = round(sd(age), 2), .parallel=TRUE)
+```
+
+In case that you are interested, here is a short shell script for knitting an Rmd file in the cluster and specifying the appropriate number of cores to then use `plyr` and `doMC`.
+
+
+```{bash}
+#!/bin/bash	
+# To run it in the current working directory
+#$ -cwd 
+# To get an email after the job is done
+#$ -m e 
+# To speficy that we want 4 cores
+#$ -pe local 4
+# The name of the job
+#$ -N myPlyJob
+
+echo "**** Job starts ****"
+date
+
+# Knit your file: assuming it's called FileToKnit.Rmd
+Rscript -e "library(knitr); knit2html('FileToKnit.Rmd')"
+
+echo "**** Job ends ****"
+date
+```
+
+Lets say that the bash script is named `script.sh`. Then you can submit it to the cluster queue using
+```{bash}
+qsub script.sh
+```
+
+
+
+This is what I used to re-format a large `data.frame` in a few minutes in the cluster for the [#jhsph753](https://twitter.com/search?q=%23jhsph753&src=typd) class homework project.
+
+So, thank you again [Hadley Wickham](https://twitter.com/hadleywickham) for making awesome R packages!
+
 
 
 Citations made with `knitcitations` `r mycitep(bib[["knitcitations"]], "Boettiger, 2013")`.
