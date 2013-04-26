@@ -1,0 +1,45 @@
+```{r setup, echo=FALSE, message=FALSE}
+## Uncomment after your are ready to publish the post
+#opts_knit$set(upload.fun=imgur_upload)
+opts_chunk$set(fig.width=5, fig.height=5, cache=TRUE)
+
+## Load knitcitations with a clean bibliography
+library(knitcitations)
+cleanbib()
+cite_options(tooltip=TRUE)
+
+## I made my own citing function since citep() doesn't work like I want to with
+## urls that are not really pages themselve like part of a GitHub repo.
+mycitep <- function(x, short, year=substr(date(), 21, 24), tooltip=TRUE) {
+	tmp <- citep(x)
+	res <- gsub("></a>", paste0(">", short, "</a>"), tmp)
+	if(tooltip) {
+		res <- gsub("\\?\\?\\?\\?", year, res)
+	}
+	res
+}
+## Here's an example
+# mycitep("https://github.com/lcolladotor/lcollado753", "Collado, 2013")
+```
+```{r bibsetup, echo=FALSE, message=FALSE, warning=FALSE}
+write.bibtex(c("knitcitations" = citation("knitcitations")), file = "pkgs.bib")
+bib <- read.bibtex("pkgs.bib")
+```
+
+
+
+This past Saturday the Epi and Biostat troops met for another fun kickball match. Obviously Biostat beat Epi, yup I know: again! This time the score was 15-8 (according to our bookkeeper and captain John) or 12-8 (according to some in Epi). 
+
+There was a hint of a surprise at the beginning when Epi scored two runs in the top of the first inning. However, the tide changed back with a homerun by Rumen. Sadly, one of the Epi players got injured and carried out of the court in that play. Rumen also pulled his quad with the big hit and was limited for the rest of the match.
+
+From that inning on forth we saw both teams having fun kicking the ball as far as we could or aim for in between the defensive lines. There were plenty of sacrifice hits, some occasional errors, but overall we had a lot of fun! 
+
+![Both teams picture](http://biostat.jhsph.edu/~lcollado/misc/Kickball2013/images/2013_04_20_16_55_15.jpg)
+
+Both teams came prepared to show their colors: them in red us in purple with some face paint for the sport battle (thanks to Aaron). However, the Epi crew did surprise us by bringing a big grill to the park and lots of food! 
+
+At the end of the match, we all mingled together and enjoyed the nice (a bit chilly) day outside in the company of some drinks and food.
+
+Some of us then continued our journey at Kislings where we played other games that involve loads of cups and some ping pong balls ;)
+
+You can [view all the pictures here](http://biostat.jhsph.edu/~lcollado/misc/Kickball2013/index.html). If you have any other pictures that you want to share, send them my way!
