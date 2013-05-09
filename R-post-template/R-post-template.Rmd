@@ -34,7 +34,13 @@ Start post
 Citations made with `knitcitations` `r mycitep(bib[["knitcitations"]], "Boettiger, 2013")`.
 
 
-```{r results='asis', echo=FALSE, cache=FALSE}
+```{r bibliography, results='asis', echo=FALSE, cache=FALSE}
 ## Print bibliography
 bibliography()
 ```
+
+Reproducibility
+```{r reproducbility}
+sessionInfo()
+```
+
